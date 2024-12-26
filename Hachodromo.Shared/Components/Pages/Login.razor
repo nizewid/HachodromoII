@@ -1,0 +1,34 @@
+﻿   @page "/login"
+   @using Hachodromo.Shared.ViewModels
+   @inject NavigationManager Navigation
+
+@if (viewModel.IsBusy)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <EditForm Model="@viewModel" OnValidSubmit="@viewModel.Login">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div>
+            <label for="email">Email:</label>
+            <InputText id="email" @bind-Value="viewModel.Email" />
+        </div>
+        <div>
+            <label for="password">Password:</label>
+            <InputText id="password" @bind-Value="viewModel.Password" type="password" />
+        </div>
+        <button type="submit">Login</button>
+    </EditForm>
+}
+
+@code {
+    private LoginViewModel viewModel = new LoginViewModel();
+
+    protected override void OnInitialized()
+    {
+        viewModel.Navigation = Navigation;
+    }
+   }

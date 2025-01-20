@@ -1,5 +1,4 @@
 ﻿using Hachodromo.Shared.Constants;
-using Hachodromo.Shared.Model;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 

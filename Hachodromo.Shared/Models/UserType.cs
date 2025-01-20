@@ -1,7 +1,6 @@
-﻿using Hachodromo.Shared.Models;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace Hachodromo.Shared.Model
+namespace Hachodromo.Shared.Models
 {
 	public class UserType
 	{

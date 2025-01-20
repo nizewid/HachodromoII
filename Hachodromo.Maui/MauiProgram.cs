@@ -1,6 +1,7 @@
 ﻿using Hachodromo.Maui.Services;
 using Hachodromo.Shared;
 using Hachodromo.Shared.Interfaces;
+using Hachodromo.Shared.Services;
 using Microsoft.Extensions.Logging;
 
 namespace Hachodromo.Maui
@@ -25,9 +26,15 @@ namespace Hachodromo.Maui
 			builder.Services.AddBlazorWebViewDeveloperTools();
 			builder.Logging.AddDebug();
 #endif
-			builder.Services.AddSingleton<IFormFactor, FormFactor>();
+            builder.Services.AddSingleton<IFormFactor, FormFactor>();
+         
+            builder.Services.AddScoped<IUserService, UserService>();
+            builder.Services.AddScoped<RegisterViewModel>();
 
-			return builder.Build();
+
+            builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://localhost") });
+
+            return builder.Build();
 		}
 	}
 }

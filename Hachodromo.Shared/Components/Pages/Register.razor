@@ -1,0 +1,145 @@
+﻿@page "/register"
+@using Hachodromo.Shared.DTOs
+@using Hachodromo.Shared.Constants
+@using Hachodromo.Shared.Models
+@using Hachodromo.Shared.Services
+@inject HttpClient Http
+@inject NavigationManager Navigation
+@inject RegisterViewModel ViewModel
+@inject IUserService UserService
+
+<h3>Formulario de Registro</h3>
+
+<EditForm Model="@user" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label for="FirstName">Nombre</label>
+        <InputText id="FirstName" class="form-control" @bind-Value="user.FirstName" />
+    </div>
+
+    <div class="form-group">
+        <label for="LastName">Apellido</label>
+        <InputText id="LastName" class="form-control" @bind-Value="user.LastName" />
+    </div>
+
+    <div class="form-group">
+        <label for="LastName2">Segundo Apellido</label>
+        <InputText id="LastName2" class="form-control" @bind-Value="user.LastName2" />
+    </div>
+
+    <div class="form-group">
+        <label for="BornDate">Fecha de Nacimiento</label>
+        <InputDate id="BornDate" class="form-control" @bind-Value="user.BornDate" />
+    </div>
+
+    <div class="form-group">
+        <label for="Sex">Sexo</label>
+        <InputSelect id="Sex" class="form-control" @bind-Value="user.Sex">
+            @foreach (var sex in Enum.GetValues(typeof(SexCode)).Cast<SexCode>())
+            {
+                <option value="@sex">@sex</option>
+            }
+        </InputSelect>
+    </div>
+
+    <div class="form-group">
+        <label for="City">Ciudad</label>
+        <InputText id="City" class="form-control" @bind-Value="user.City" />
+    </div>
+
+    <div class="form-group">
+        <label for="Region">Región</label>
+        <InputSelect id="Region" class="form-control" @bind-Value="user.Region">
+            @foreach (var region in Enum.GetValues(typeof(Region)).Cast<Region>())
+            {
+                <option value="@region">@region</option>
+            }
+        </InputSelect>
+    </div>
+
+    <div class="form-group">
+        <label for="Email">Correo Electrónico</label>
+        <InputText id="Email" class="form-control" @bind-Value="user.Email" />
+    </div>
+
+    <div class="form-group">
+        <label for="Password">Contraseña</label>
+        <InputText id="Password" class="form-control" @bind-Value="user.Password" type="password" />
+    </div>
+
+    <div class="form-group">
+        <label for="UserType">Tipo de Usuario</label>
+        <InputSelect id="UserType" class="form-control" @bind-Value="user.UserType">
+            @foreach (var userType in userTypes)
+            {
+                <option value="@userType.Id">@userType.Name</option>
+            }
+        </InputSelect>
+    </div>
+
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">Registrar</button>
+    </div>
+</EditForm>
+
+@code {
+    private CreateUserDto user = new CreateUserDto { Sex = SexCode.Male };  // O cualquier valor predeterminado que desees
+    private List<UserType> userTypes = new List<UserType>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Asegúrate de que el valor inicial de Sex se asigne después de la inicialización
+        user.Sex = SexCode.Male;  // Asignación del valor predeterminado
+
+        userTypes = await UserService.GetUserTypesAsync();
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        PrintUserDetails();
+        try
+        {
+            var success = await UserService.RegisterUserAsync(user);
+            if (success)
+            {
+                // Si el registro fue exitoso, redirigimos al usuario a la página de login
+                Navigation.NavigateTo("/login");
+            }
+            else
+            {
+                // Mostrar un mensaje de error si el registro falló
+                Console.WriteLine("Error al registrar el usuario.");
+                // Puedes agregar una variable para mostrar un mensaje de error en la UI
+            }
+        }
+        catch (HttpRequestException httpEx)
+        {
+            // Manejar problemas de red o de la API
+            Console.WriteLine($"Error en la solicitud HTTP: {httpEx.Message}");
+            // Puedes mostrar un mensaje de error más amigable al usuario
+        }
+        catch (Exception ex)
+        {
+            // Manejar cualquier otra excepción
+            Console.WriteLine($"Error inesperado al registrar el usuario: {ex.Message}");
+            // Puedes mostrar un mensaje genérico de error
+        }
+    }
+
+    private void PrintUserDetails()
+    {
+        Console.WriteLine($"Nombre: {user.FirstName}");
+        Console.WriteLine($"Apellido: {user.LastName}");
+        Console.WriteLine($"Segundo Apellido: {user.LastName2}");
+        Console.WriteLine($"Fecha de Nacimiento: {user.BornDate}");
+        Console.WriteLine($"Sexo: {user.Sex}");
+        Console.WriteLine($"Ciudad: {user.City}");
+        Console.WriteLine($"Región: {user.Region}");
+        Console.WriteLine($"Correo Electrónico: {user.Email}");
+        Console.WriteLine($"Contraseña: {user.Password}");
+        Console.WriteLine($"Tipo de Usuario: {user.UserType}");
+    }
+}
+

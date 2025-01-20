@@ -7,7 +7,7 @@ namespace Hachodromo.Shared.DTOs
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string LastName2 { get; set; } // Agregado
-        public DateTime BornDate { get; set; } // Agregado
+        public DateTime BornDate { get; set; }
         public string Email { get; set; }
         public SexCode Sex { get; set; } // Cambiado de int a SexCode
         public string City { get; set; }
@@ -15,6 +15,6 @@ namespace Hachodromo.Shared.DTOs
         public bool IsActive { get; set; }
         public string Password { get; set; }  // Se incluye para el registro
         public int UserType { get; set; }  // Se puede mantener como nombre o ID
-        public List<MembershipDto> Memberships { get; set; }
+        public List<MembershipDto> Memberships { get; set; } = new List<MembershipDto>();
     }
 }

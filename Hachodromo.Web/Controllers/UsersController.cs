@@ -43,7 +43,7 @@ namespace Hachodromo.Web.Controllers
                     City = user.City,
                     Region = (Region)(int)user.Region,
                     IsActive = user.IsActive,
-                    UserType = user.UserType.Name,
+                    UserType = user.UserType.Id,
                     Memberships = user.Memberships.Select(m => new MembershipDto
                     {
                         MembershipType = m.MembershipType,
@@ -70,7 +70,7 @@ namespace Hachodromo.Web.Controllers
                     City = user.City,
                     Region = (Region)(int)user.Region,
                     IsActive = user.IsActive,
-                    UserType = user.UserType.Name,
+                    UserType = user.UserType.Id,
                     Memberships = user.Memberships.Select(m => new MembershipDto
                     {
                         MembershipType = m.MembershipType,
@@ -88,7 +88,7 @@ namespace Hachodromo.Web.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<ActionResult<UserDto>> CreateUser([FromBody] CreateUserDto createUserDto)
+        public async Task<IActionResult> CreateUser([FromBody] CreateUserDto createUserDto)
         {
             try
             {
@@ -120,39 +120,33 @@ namespace Hachodromo.Web.Controllers
                         MembershipType = m.MembershipType,
                         StartDate = m.StartDate,
                         ExpirationDate = m.ExpirationDate
-                    }).ToList()
+                    }).ToList() ?? new List<Membership>()
                 };
-
-                // Imprimir los detalles del objeto User antes de guardarlo
-                PrintUserDetails(user);
 
                 // Guardar el objeto User en la base de datos
                 _context.Users.Add(user);
                 await _context.SaveChangesAsync();
 
-                // Crear el objeto UserDto a partir del objeto User recién creado
+                // Convertir el usuario a UserDto para devolver una respuesta con los datos del usuario
                 var userDto = new UserDto
                 {
                     Id = user.Id,
                     FirstName = user.FirstName,
                     LastName = user.LastName,
-                    LastName2 = user.LastName2,
-                    BornDate = user.BornDate,
-                    Sex = user.Sex, // Cambiado de int a SexCode
+                    Sex = user.Sex,
                     Email = user.Email,
                     City = user.City,
                     Region = (Region)(int)user.Region,
                     IsActive = user.IsActive,
-                    UserType = user.UserType.Name,
-                    Memberships = user.Memberships?.Select(m => new MembershipDto
+                    UserType = user.UserTypeId,
+                    Memberships = user.Memberships.Select(m => new MembershipDto
                     {
                         MembershipType = m.MembershipType,
                         StartDate = m.StartDate,
                         ExpirationDate = m.ExpirationDate
                     }).ToList()
                 };
-
-                // Devolver el objeto UserDto como respuesta
+                // Devolver el usuario recién creado junto con el estado 201 (creado)
                 return CreatedAtAction(nameof(GetUser), new { id = user.Id }, userDto);
             }
             catch (Exception ex)
@@ -164,7 +158,6 @@ namespace Hachodromo.Web.Controllers
                 return StatusCode(500, "Hubo un problema al procesar la solicitud. Intenta más tarde.");
             }
         }
-
 
 
 
@@ -212,7 +205,7 @@ namespace Hachodromo.Web.Controllers
             user.City = userDto.City;
             user.Region = (Region)userDto.Region;
             user.IsActive = userDto.IsActive;
-            user.UserTypeId = _context.UserTypes.FirstOrDefault(ut => ut.Name == userDto.UserType)?.Id ?? 0;
+            user.UserTypeId = userDto.UserType;
 
             _context.Users.Update(user);
             await _context.SaveChangesAsync();

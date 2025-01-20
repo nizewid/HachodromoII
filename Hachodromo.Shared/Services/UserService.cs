@@ -23,30 +23,8 @@ namespace Hachodromo.Shared.Services
         {
             try
             {
-
-                var user = new User
-                {
-                    FirstName = createUserDto.FirstName,
-                    LastName = createUserDto.LastName,
-                    LastName2 = createUserDto.LastName2,
-                    BornDate = createUserDto.BornDate,
-                    Email = createUserDto.Email,
-                    Sex = createUserDto.Sex,
-                    City = createUserDto.City,
-                    Region = (Region)createUserDto.Region,
-                    IsActive = createUserDto.IsActive,
-                    PasswordHash = BCrypt.Net.BCrypt.HashPassword(createUserDto.Password),
-                    UserTypeId = createUserDto.UserType, // Asignar el UserTypeId encontrado
-                    Memberships = createUserDto.Memberships?.Select(m => new Membership
-                    {
-                        MembershipType = m.MembershipType,
-                        StartDate = m.StartDate,
-                        ExpirationDate = m.ExpirationDate
-                    }).ToList()
-                };
-
                 var endpoint = "api/users/register";
-                var response = await _httpClient.PostAsJsonAsync(_apiRoute + endpoint, user);
+                var response = await _httpClient.PostAsJsonAsync(_apiRoute + endpoint, createUserDto);
 
                 if (!response.IsSuccessStatusCode)
                 {
@@ -76,7 +54,7 @@ namespace Hachodromo.Shared.Services
             try
             {
                 var endpoint = "api/Users/user-types";
-                var userTypes = await _httpClient.GetFromJsonAsync<List<UserType>>(_apiRoute + endpoint);
+                    var userTypes = await _httpClient.GetFromJsonAsync<List<UserType>>(_apiRoute + endpoint);
 
                 // Si la lista de tipos de usuario no es nula, excluimos el tipo "SuperAdmin"
                 if (userTypes != null)
